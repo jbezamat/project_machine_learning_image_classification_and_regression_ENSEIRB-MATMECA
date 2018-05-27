@@ -1,6 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from keras import utils as np_utils
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+from keras.optimizers import SGD
+from keras.optimizers import Adam
+
 
 def generate_a_drawing(figsize, U, V, noise=0.0):
     fig = plt.figure(figsize=(figsize,figsize))
@@ -68,17 +73,6 @@ def generate_a_triangle(noise=0.0, free_location=False):
     imdata = generate_a_drawing(figsize, U, V, noise)
     return [imdata, [U[0], V[0], U[1], V[1], U[2], V[2]]]
 
-
-im = generate_a_rectangle(10, True)
-plt.imshow(im.reshape(100,100), cmap='gray')
-
-im = generate_a_disk(10)
-plt.imshow(im.reshape(100,100), cmap='gray')
-
-[im, v] = generate_a_triangle(20, False)
-plt.imshow(im.reshape(100,100), cmap='gray')
-
-
 def generate_dataset_classification(nb_samples, noise=0.0, free_location=False):
     # Getting im_size:
     im_size = generate_a_rectangle().shape[0]
@@ -97,12 +91,12 @@ def generate_dataset_classification(nb_samples, noise=0.0, free_location=False):
             [X[i], V] = generate_a_triangle(noise, free_location)
         Y[i] = category
     X = (X + noise) / (255 + 2 * noise)
+    Y = np_utils.to_categorical(Y, 3)
     return [X, Y]
 
-def generate_test_set_classification():
+def generate_test_set_classification(nb_test=300, noise=20, free_location=True):
     np.random.seed(42)
-    [X_test, Y_test] = generate_dataset_classification(300, 20, True)
-    Y_test = np_utils.to_categorical(Y_test, 3)
+    [X_test, Y_test] = generate_dataset_classification(nb_test, noise, free_location)
     return [X_test, Y_test]
 
 def generate_dataset_regression(nb_samples, noise=0.0):
